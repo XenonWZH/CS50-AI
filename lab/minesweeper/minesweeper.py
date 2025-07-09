@@ -263,10 +263,3 @@ class MinesweeperAI():
                 if (i, j) not in self.moves_made and (i, j) not in self.mines:
                     return (i, j)
         return None
-
-ai = MinesweeperAI(height=4, width=5)
-ai.add_knowledge((2, 4), 1)
-ai.add_knowledge((2, 3), 1)
-ai.add_knowledge((1, 4), 0)
-ai.add_knowledge((3, 2), 0)
-expected = {(3, 4)}
