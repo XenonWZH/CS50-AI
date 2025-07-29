@@ -57,7 +57,17 @@ def transition_model(corpus, page, damping_factor):
     linked to by `page`. With probability `1 - damping_factor`, choose
     a link at random chosen from all pages in the corpus.
     """
-    raise NotImplementedError
+    ans = {}
+    for p in corpus:
+        ans[p] = 0
+
+    for p in corpus[page]:
+        ans[p] += damping_factor / len(corpus[page])
+
+    for p in corpus:
+        ans[p] += ((1 - damping_factor) if corpus[page] else 1) / len(corpus)
+
+    return ans
 
 
 def sample_pagerank(corpus, damping_factor, n):
@@ -69,7 +79,24 @@ def sample_pagerank(corpus, damping_factor, n):
     their estimated PageRank value (a value between 0 and 1). All
     PageRank values should sum to 1.
     """
-    raise NotImplementedError
+    ans = {}
+    for p in corpus:
+        ans[p] = 0
+
+    current_page = random.choice(list(corpus.keys()))
+
+    for _ in range(n):
+        ans[current_page] += 1 / n
+        possibility = random.random()
+
+        for p, prob in transition_model(corpus, current_page, damping_factor).items():
+            if possibility <= prob:
+                current_page = p
+                break
+            else:
+                possibility -= prob
+
+    return ans
 
 
 def iterate_pagerank(corpus, damping_factor):
@@ -81,7 +108,31 @@ def iterate_pagerank(corpus, damping_factor):
     their estimated PageRank value (a value between 0 and 1). All
     PageRank values should sum to 1.
     """
-    raise NotImplementedError
+    ans = {}
+    for p in corpus:
+        ans[p] = 1 / len(corpus)
+
+    while True:
+        res = {}
+        for p in corpus:
+            res[p] = 0
+
+        for p in corpus:
+            for q, prob in transition_model(corpus, p, damping_factor).items():
+                res[q] += ans[p] * prob
+
+        finished = True
+        for p in corpus:
+            if abs(res[p] - ans[p]) > 0.001:
+                finished = False
+                break
+
+        ans = res.copy()
+
+        if finished:
+            break
+
+    return ans
 
 
 if __name__ == "__main__":
